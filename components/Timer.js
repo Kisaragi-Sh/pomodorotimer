@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, Button, TextInput } from 'react-native'
 import TimerText from './TimerText'
+import moment from 'moment';
 
 class Timer extends Component {
     constructor(props) {
@@ -10,7 +11,7 @@ class Timer extends Component {
             //will display Work Timer/Break Timer text
             timerText: "Work Timer",
             //will display Work/Break Time Count Down text
-            timerCount: 100,
+            workCount: 100,
             //will display Start/Reset
             startText: "Start",
             //will display Pause/Resume
@@ -31,11 +32,11 @@ class Timer extends Component {
     startWork() {
         this.setState(prevState => ({
             startText: "Pause",
-            isStarting: !prevState.isStarting
+            isStarting: !prevState.isStarting,
         }))
         this.interval = setInterval(() => {
             this.setState(prevState => ({
-                timerCount: prevState.timerCount - 1,
+                workCount: prevState.workCount - 1000,
             }))
         }, 1000);
     }
@@ -64,8 +65,12 @@ class Timer extends Component {
         }))
     }
 
-    inputChangeHandlerMin = workInputMin => {
-        this.setState({ workInputMin })
+    inputChangeHandlerMin = workCount => {
+        this.setState({ workCount: workCount * 60000})
+    }
+
+    inputChangeHandlerSec = workCount => {
+        this.setState({ workCount: workCount * 1000 })
     }
 
     // componentDidMount() {
@@ -77,19 +82,20 @@ class Timer extends Component {
     // }
 
     render() {
+        const duration = moment.duration(this.state.workCount)
         return (
             <View style={styles.container}>
                 <Text style={styles.timerText}>
                     {this.state.timerText}
                 </Text>
                 <Text style={styles.countText} >
-                    {this.state.timerCount}
+                    {duration.minutes()}:{duration.seconds()}
                 </Text>
                 <View style={styles.buttonContainer}>
                     <Button title={this.state.startText} onPress={() => this.timerStartHandler()} />
                     <Button title={this.state.resetText} onPress={() => this.resetHandler()} />
                 </View>
-                <TimerText workText="Work Time: " minText="Mins: " secText="Secs: " valueMin={this.state.workInputMin} valueSec={this.state.workInputSec} functionMin={this.inputChangeHandlerMin} />
+                <TimerText workText="Work Time: " minText="Mins: " secText="Secs: " valueMin={this.state.workCount} valueSec={this.state.workCount} functionMin={this.inputChangeHandlerMin} functionSec={this.inputChangeHandlerSec} />
                 <TimerText workText="Break Time:  " minText="Mins: " secText="Secs: " valueMin={this.state.breakInputMin} valueSec={this.state.breakInputSec} />
             </View>
         )

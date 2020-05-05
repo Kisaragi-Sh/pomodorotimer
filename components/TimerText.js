@@ -15,7 +15,7 @@ const TimerText = (props) => {
             <Text>
                 {props.secText}
             </Text>
-            <TimerInput value={props.valueSec} />
+            <TimerInput value={props.valueSec} function={props.functionSec} />
         </View>
     )
 }
