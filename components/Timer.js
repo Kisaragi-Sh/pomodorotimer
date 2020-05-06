@@ -10,18 +10,21 @@ class Timer extends Component {
         this.state = {
             //will display Work Timer/Break Timer text
             timerText: "Work Timer",
+            //Store the Work/Break Time Count Down string
+            workCount: 300000,
+            breakCount: 300000,
             //will display Work/Break Time Count Down text
-            workCount: 100,
+            displayCount: 300000,
             //will display Start/Reset
             startText: "Start",
             //will display Pause/Resume
             resetText: "Reset",
             //store input time for work
-            workInputMin: "1",
-            workInputSec: "2",
+            workInputMin: 0,
+            workInputSec: 0,
             //store input time for break
-            breakInputMin: "3",
-            breakInputSec: "4",
+            breakInputMin: 0,
+            breakInputSec: 0,
             isWorking: true,
             isStarting: false,
             isReseting: false,
@@ -36,9 +39,28 @@ class Timer extends Component {
         }))
         this.interval = setInterval(() => {
             this.setState(prevState => ({
-                workCount: prevState.workCount - 1000,
+                displayCount: prevState.displayCount - 1000,
             }))
         }, 1000);
+    }
+
+    componentDidUpdate() {
+        if (this.state.displayCount < 0) {
+            if (this.state.isWorking === true) {
+                this.setState({
+                    isWorking: false,
+                    timerText: "Break Timer",
+                    displayCount: this.state.breakCount
+                })
+            }
+            else {
+                this.setState({
+                    isWorking: true,
+                    timerText: "Work Timer",
+                    displayCount: this.state.workCount
+                })
+            }
+        }
     }
 
     pauseWork() {
@@ -59,30 +81,165 @@ class Timer extends Component {
     }
 
     resetHandler() {
-        this.setState(prevState => ({
-            resetText: !this.state.isReseting ? "Resume" : "Reset",
-            isReseting: !prevState.isReseting
-        }))
+        if (this.state.isWorking === true) {
+            const defaultWork = 900000
+            this.setState({
+                workCount: defaultWork,
+                displayCount: defaultWork,
+            });
+        } else {
+            const defaultBreak = 900000
+            this.setState({
+                breakCount: defaultBreak,
+                displayCount: defaultBreak
+            });
+        }
     }
 
-    inputChangeHandlerMin = workCount => {
-        this.setState({ workCount: workCount * 60000})
+    workInputHandlerMin = workCount => {
+        if (this.state.isWorking === true) {
+            if (this.state.workInputSec === 0) {
+                const current = workCount * 60000
+                this.setState({
+                    workCount: workCount * 60000,
+                    displayCount: workCount * 60000,
+                    workInputMin: current,
+                })
+            } else {
+                console.log("sec" + this.state.workInputSec)
+                const current = workCount * 60000
+                this.setState({
+                    workCount: this.state.workInputSec + current,
+                    displayCount: this.state.workInputSec + current,
+                    workInputMin: current
+                })
+            }
+        } else {
+            if (this.state.workInputSec === 0) {
+                const current = workCount * 60000
+                this.setState({
+                    workCount: workCount * 60000,
+                    workInputMin: current,
+                })
+            } else {
+                console.log("sec" + this.state.workInputSec)
+                const current = workCount * 60000
+                this.setState({
+                    workCount: this.state.workInputSec + current,
+                    workInputMin: current
+                })
+            }
+        }
     }
 
-    inputChangeHandlerSec = workCount => {
-        this.setState({ workCount: workCount * 1000 })
+    workInputHandlerSec = workCount => {
+        if (this.state.isWorking === true) {
+            if (this.state.workInputMin === 0) {
+                console.log(this.state.workInputMin)
+                const current = workCount * 1000
+                this.setState({
+                    workCount: current,
+                    displayCount: current,
+                    workInputSec: current
+                })
+            } else {
+                console.log("min" + this.state.workInputMin)
+                const current = workCount * 1000
+                this.setState({
+                    workCount: this.state.workInputMin + current,
+                    displayCount: this.state.workInputMin + current,
+                    workInputSec: current
+                })
+            }
+        } else {
+            if (this.state.workInputMin === 0) {
+                console.log(this.state.workInputMin)
+                const current = workCount * 1000
+                this.setState({
+                    workCount: workCount * 1000,
+                    workInputSec: current
+                })
+            } else {
+                console.log("min" + this.state.workInputMin)
+                const current = workCount * 1000
+                this.setState({
+                    workCount: this.state.workInputMin + current,
+                    workInputSec: current
+                })
+            }
+        }
     }
 
-    // componentDidMount() {
-    //     setInterval(() => {
-    //         this.setState(prevState => ({
-    //             timerCount: prevState.timerCount - 1,
-    //         }))
-    //     }, 1000);
-    // }
+    breakInputHandlerMin = breakCount => {
+        if (this.state.isWorking === false) {
+            if (this.state.breakInputSec === 0) {
+                const current = breakCount * 60000
+                this.setState({
+                    breakCount: current,
+                    displayCount: current,
+                    breakInputMin: current,
+                })
+            } else {
+                const current = breakCount * 60000
+                this.setState({
+                    breakCount: this.state.breakInputMin + current,
+                    displayCount: this.state.breakInputMin + current,
+                    breakInputMin: current
+                });
+            }
+        } else {
+            if (this.state.breakInputSec === 0) {
+                const current = breakCount * 60000
+                this.setState({
+                    breakCount: current,
+                    breakInputMin: current,
+                })
+            } else {
+                const current = breakCount * 60000
+                this.setState({
+                    breakCount: this.state.breakInputMin + current,
+                    breakInputMin: current
+                });
+            }
+        }
+    }
+
+    breakInputHandlerSec = breakCount => {
+        if (this.state.isWorking === false) {
+            if (this.state.breakInputMin === 0) {
+                const current = breakCount * 1000
+                this.setState({
+                    breakCount: current,
+                    displayCount: current,
+                    breakInputSec: current
+                });
+            } else {
+                const current = breakCount * 1000
+                this.setState({
+                    breakCount: this.state.breakInputMin + current,
+                    displayCount: this.state.breakInputMin + current,
+                    breakInputSec: current
+                });
+            }
+        } else {
+            if (this.state.breakInputMin === 0) {
+                const current = breakCount * 1000
+                this.setState({
+                    breakCount: current,
+                    breakInputSec: current
+                });
+            } else {
+                const current = breakCount * 1000
+                this.setState({
+                    breakCount: this.state.breakInputMin + current,
+                    breakInputSec: current
+                });
+            }
+        }
+    }
 
     render() {
-        const duration = moment.duration(this.state.workCount)
+        const duration = moment.duration(this.state.displayCount)
         return (
             <View style={styles.container}>
                 <Text style={styles.timerText}>
@@ -95,8 +252,8 @@ class Timer extends Component {
                     <Button title={this.state.startText} onPress={() => this.timerStartHandler()} />
                     <Button title={this.state.resetText} onPress={() => this.resetHandler()} />
                 </View>
-                <TimerText workText="Work Time: " minText="Mins: " secText="Secs: " valueMin={this.state.workCount} valueSec={this.state.workCount} functionMin={this.inputChangeHandlerMin} functionSec={this.inputChangeHandlerSec} />
-                <TimerText workText="Break Time:  " minText="Mins: " secText="Secs: " valueMin={this.state.breakInputMin} valueSec={this.state.breakInputSec} />
+                <TimerText workText="Work Time: " minText="Mins: " secText="Secs: " valueMin={this.state.workCount} valueSec={this.state.workCount} functionMin={this.workInputHandlerMin} functionSec={this.workInputHandlerSec} />
+                <TimerText workText="Break Time:  " minText="Mins: " secText="Secs: " valueMin={this.state.breakInputMin} valueSec={this.state.breakInputSec} functionMin={this.breakInputHandlerMin} functionSec={this.breakInputHandlerSec} />
             </View>
         )
     }
